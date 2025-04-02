@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+progress,
+progress::-webkit-progress-value {
+  border: 0;
+  border-radius: 9999px;
+  background: var(--color-amber-800);
+  z-index: 20;
+}
+
+progress::-webkit-progress-bar {
+  border: 0;
+  border-radius: 9999px;
+  background: var(--color-amber-600);
+  z-index: 20;
+}
+
+progress::-moz-progress-bar {
+  border: 0;
+  border-radius: 9999px;
+  background: var(--color-amber-600);
+  z-index: 20;
+}
+
+@keyframes fade {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  25% {
+    transform: translate(100px, 50%) rotate(15deg);
+  }
+  50% {
+    transform: translateY(2em) scale(1.2)
+  }
+  75% {
+    transform: translateX(2em) rotate(-10deg)
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5) translate(-50px, -50px);
+  }
+}
+
+.animate-fade {
+  animation: fade 1s ease-out;
+  filter: blur(40px);
+  position: absolute;
+  border-radius: 9999px;
+  background-color: var(--color-amber-500, --color-amber-300);
+}
