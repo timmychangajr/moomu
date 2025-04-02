@@ -9,9 +9,9 @@ export interface Melody {
     notes: Note[];
 }
 
-export default async function fetchMelody() {
+export default async function fetchMelody(mood: string) {
     let melody: Note[] = [];
-    await fetch('/api/melody-ai')
+    await fetch('/api/melody-ai', { method: 'POST',  body: JSON.stringify({ mood }) })
         .then((response) => {
             if (!response.ok) {
                 console.info('Response not ok', response);

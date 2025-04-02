@@ -8,7 +8,7 @@ import { ranum } from './lib/utils';
 
 const styles = {
   container: "p-4 bg-amber-900 min-h-screen flex flex-col items-center justify-center",
-  button: "ml-2 bg-amber-800 px-4 py-2 rounded-full font-bold text-amber-200 hover:text-amber-400 cursor-pointer",
+  button: "ml-2 bg-amber-800 px-4 py-2 rounded-full font-bold text-amber-200 hover:text-amber-400",
   spinner: "animate-spin border-4 border-amber-500 border-t-transparent rounded-full w-6 h-6 relative z-100",
   responseContainer: "mt-4 text-amber-200 font-bold w-full flex items-center flex-col transition-all duration-1000",
   hidden: "hidden",
@@ -24,10 +24,12 @@ const styles = {
 
 const Page = () => {
   const [response, setResponse] = useState<Note[] | undefined>();
+  const [mood, setMood] = useState('')
   const [noteIndex, setNoteIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [songProgress, setSongProgress] = useState(0);
   const [animations, setAnimations] = useState<{ id: number; x: number; y: number; size: number }[]>([]);
+  const buttonDisabled = useMemo(() => !mood, [mood]);
 
   const cleanState  = () => {
     setSongProgress(0);
@@ -36,7 +38,7 @@ const Page = () => {
 
   const handleSend = async () => {
     setLoading(true);
-    const response = await fetchMelody();
+    const response = await fetchMelody(mood);
     setResponse(response);
     setLoading(false);
   };
@@ -103,9 +105,16 @@ const Page = () => {
   return (
     <div className={styles.container}>
       <div className="mb-4 relative">
+        <input
+          placeholder='Enter mood...'
+          onChange={e => setMood(e.target.value)}
+          value={mood}
+          className={`outline-none font-bold ${!buttonDisabled && 'border-b-2 border-amber-200'}`}
+        />
         <button
           onClick={handleSend}
-          className={`relative ${styles.button}`}
+          disabled={buttonDisabled}
+          className={`relative ${styles.button} ${buttonDisabled ? 'opacity-[0.7]' : 'cursor-pointer'}`}
         >
           {loading ? (
             <div className={styles.spinner}></div>

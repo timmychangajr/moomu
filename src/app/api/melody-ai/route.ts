@@ -1,5 +1,5 @@
 import { ranum } from "@/app/lib/utils";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
 const ALL_NOTES = [
@@ -31,12 +31,12 @@ const ALL_NOTES = [
 // }
 
 //AI Melody Generation
-export async function GET() {
+export async function POST(req: NextRequest) {
     const defaultMelody = Array.from({ length: ranum(50, 8) }, () => ({
         note: ALL_NOTES[ranum(ALL_NOTES.length)],
         interval: ranum(500, 100),
     }));
-
+    const { mood } = await req.json()
     const apiKey = process.env.NEXT_PUBLIC_ANTHROPIC_KEY;
     if (!apiKey) {
         return NextResponse.json(
@@ -55,9 +55,10 @@ export async function GET() {
             {
                 role: "user",
                 content: 'give me a unique melody to try. ' +
-                    'return raw array value of notes with the following format: ' +
-                    'note: string, interval: milliseconds' + 
-                    'no extra text, no explanation, no comments. no line breaks. '
+                    'make sure it represents mood: ' + mood +
+                    '. Return raw array value of notes with the following format: ' +
+                    'note: string, interval: milliseconds' +
+                    'No extra text, no explanation, no comments. no line breaks. '
             },
         ],
         response_format: { type: "json_object" },
