@@ -1,4 +1,3 @@
-import { ranum } from "@/app/lib/utils";
 import { defaultMelody } from "@/services/melody";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
