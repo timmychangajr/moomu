@@ -8,7 +8,7 @@ import { ranum } from './lib/utils';
 
 const styles = {
   container: "p-4 bg-amber-900 min-h-screen flex flex-col items-center justify-center",
-  button: "ml-2 bg-amber-800 px-4 py-2 rounded-full font-bold text-amber-200 hover:text-amber-400",
+  button: "bg-amber-800 px-4 py-2 rounded-full font-bold text-amber-200 hover:text-amber-400",
   spinner: "animate-spin border-4 border-amber-500 border-t-transparent rounded-full w-6 h-6 relative z-100",
   responseContainer: "mt-4 text-amber-200 font-bold w-full flex items-center flex-col transition-all duration-1000",
   hidden: "hidden",
@@ -19,7 +19,8 @@ const styles = {
   inactiveNote: "text-amber-600 mx-1",
   animationContainer: "absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden",
   animation: "animate-fade",
-  footer: 'fixed bottom-0 left-0 right-0 justify-center items-center flex font-bold text-amber-700 p-8 flex flex-col gap-2'
+  footer: 'fixed bottom-0 left-0 right-0 justify-center items-center flex font-bold text-amber-700 p-8 flex flex-col gap-2',
+  inputContainer: 'mb-4 relative flex sm:flex-row flex-col gap-2 items-center justify-center'
 };
 
 const Page = () => {
@@ -104,7 +105,7 @@ const Page = () => {
 
   return (
     <div className={styles.container}>
-      <div className="mb-4 relative">
+      <div className={styles.inputContainer}>
         <input
           placeholder='Enter mood...'
           onChange={e => setMood(e.target.value)}
