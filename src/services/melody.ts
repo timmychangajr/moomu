@@ -1,3 +1,4 @@
+import { defaultMelody } from "@/app/api/melody-ai/route";
 
 export interface Note {
     note: string;
@@ -11,11 +12,15 @@ export interface Melody {
 
 export default async function fetchMelody(mood: string) {
     let melody: Note[] = [];
-    await fetch('/api/melody-ai', { method: 'POST',  body: JSON.stringify({ mood }) })
+    await fetch('/api/melody-ai', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ mood }) 
+    })
         .then((response) => {
             if (!response.ok) {
                 console.info('Response not ok', response);
-                throw new Error('Network response was not ok');
+                return {melody: defaultMelody};
             }
             return response.json();
         })

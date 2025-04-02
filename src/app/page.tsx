@@ -12,8 +12,7 @@ const styles = {
   spinner: "animate-spin border-4 border-amber-500 border-t-transparent rounded-full w-6 h-6 relative z-100",
   responseContainer: "mt-4 text-amber-200 font-bold w-full flex items-center flex-col transition-all duration-1000",
   hidden: "hidden",
-  progressWrapper: "flex items-center flex-col sm:flex-row sm:justify-start",
-  progress: "absolute z-0 top-0 left-0 bottom-0 right-0",
+  progressWrapper: "flex items-center justify-center flex-col sm:flex-row sm:justify-start",
   notesWrapper: "mt-2 flex flex-wrap justify-center items-center sm:max-w-[60vw]",
   activeNote: "text-amber-500 bg-amber-800 rounded-lg p-2 m-1",
   inactiveNote: "text-amber-600 mx-1",
@@ -120,14 +119,14 @@ const Page = () => {
           {loading ? (
             <div className={styles.spinner}></div>
           ) : <span className='relative z-100'>GIVE ME A MELODY</span>}
-          <progress value={songProgress} className={`${styles.progress}`} />
         </button>
       </div>
       <div className={`${styles.responseContainer} ${response ? 'display' : styles.hidden}`}>
         <div className={styles.progressWrapper}>
-          <button onClick={playMelody} className="mb-2 sm:mb-0">
+          <button onClick={playMelody} className="mr-2 sm:mb-0">
             <CirclePlay size={50} className='cursor-pointer hover:text-amber-400' />
           </button>
+          <progress value={songProgress} />
         </div>
         <div className={styles.notesWrapper}>
           {response?.map((note, index) => (

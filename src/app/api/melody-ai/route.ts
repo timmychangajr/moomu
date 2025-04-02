@@ -14,7 +14,7 @@ const ALL_NOTES = [
     "C8"
 ];
 
-// export async function GET(req: NextRequest, res: NextResponse) {
+// export async function POST(req: NextRequest, res: NextResponse) {
 //     const defaultMelody = Array.from({ length: ranum(50, 8) }, () => ({
 //         note: ALL_NOTES[ranum(ALL_NOTES.length)],
 //         interval: ranum(500, 100),
@@ -30,12 +30,12 @@ const ALL_NOTES = [
 //     );
 // }
 
+export const defaultMelody = Array.from({ length: ranum(50, 8) }, () => ({
+    note: ALL_NOTES[ranum(ALL_NOTES.length)],
+    interval: ranum(500, 100),
+}));
 //AI Melody Generation
 export async function POST(req: NextRequest) {
-    const defaultMelody = Array.from({ length: ranum(50, 8) }, () => ({
-        note: ALL_NOTES[ranum(ALL_NOTES.length)],
-        interval: ranum(500, 100),
-    }));
     const { mood } = await req.json()
     const apiKey = process.env.NEXT_PUBLIC_ANTHROPIC_KEY;
     if (!apiKey) {
