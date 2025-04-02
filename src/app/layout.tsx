@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Melody Bisque",
+  title: "MooMu",
   description: "Delicisious melodies for your brain",
 };
 
