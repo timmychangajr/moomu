@@ -188,7 +188,13 @@ const Page = () => {
       </div>
       <footer className={styles.footer}>
         <span>Powered By Claude AI</span>
-        <a className='text-amber-500 px-5 py-1 bg-amber-800 rounded-lg text-sm' href="https://timmyjr.netlify.app">Portfolio</a>
+        <a
+          className='text-amber-500 px-5 py-1 bg-amber-800 rounded-lg text-sm'
+          href="https://timmyjr.netlify.app"
+          target="_blank"
+          rel="noopener noreferrer">
+          Portfolio
+        </a>
       </footer>
     </div>
   );
