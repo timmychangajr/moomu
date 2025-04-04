@@ -31,7 +31,8 @@ const Page = () => {
   const [animation, setAnimation] = useState<{ id: number; x: number; y: number; size: number }>();
   const buttonDisabled = useMemo(() => !mood, [mood]);
 
-  const cleanState = () => {
+  const cleanState = (interval?: NodeJS.Timeout, synth?: Tone.MonoSynth) => {
+    if (interval) clearInterval(interval);
     setSongProgress(0);
     setAnimation(undefined);
   }
@@ -62,10 +63,13 @@ const Page = () => {
     cleanState()
 
     await Tone.start();
+    const autoWah = new Tone.AutoWah(50, 6, -30).toDestination();
     const freeverb = new Tone.Freeverb().toDestination()
     freeverb.dampening = ranum(1000);
     const synth = new Tone.MonoSynth()
+    synth.connect(autoWah);
     synth.connect(freeverb);
+    autoWah.Q.value = 6;
     let currentTime = Tone.now();
 
     response?.forEach(({ note, interval }, index) => {
@@ -84,11 +88,12 @@ const Page = () => {
       });
     }, 100);
 
-    setTimeout(() => {
-      cleanState();
+    synth.context.createBufferSource().onended = () => {
       synth.dispose();
-      synth.disconnect();
-      clearInterval(interval);
+    };
+
+    setTimeout(() => {
+      cleanState(interval, synth);
     }, fullDuration);
   };
 
@@ -100,32 +105,32 @@ const Page = () => {
 
   useEffect(() => {
     if (animation) {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        const scale = ranum(3, 0.5).toFixed(1);
-        const scale2 = ranum(3, 0.5).toFixed(1);
-        const newX = ranum(width, -width);
-        const newY = ranum(width, -height);
-        const keyframes: Keyframe[] = [
-          { offset: 0, transform: 'translateY(0)', opacity: 0 },
-          { offset: 0.25, transform: `translateX(${newX}px)`, opacity: 1 },
-          { offset: 0.25, transform: `translateY(${newY}px)`, opacity: 1 },
-          { offset: 0.25, transform: `scale(${scale})`, opacity: 1 },
-          { offset: 0.50, transform: `scale(${scale2})`, opacity: 1 },
-          { offset: 0.75, transform: `translateX(${newX}px)`, opacity: 1 },
-          { offset: 0.75, transform: `translateY(${newY}px)`, opacity: 1 },
-          { offset: 1, transform: 'translateY(0)', opacity: 0 }
-        ];
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const scale = ranum(3, 0.5).toFixed(1);
+      const scale2 = ranum(3, 0.5).toFixed(1);
+      const newX = ranum(width, -width);
+      const newY = ranum(width, -height);
+      const keyframes: Keyframe[] = [
+        { offset: 0, transform: 'translateY(0)', opacity: 0 },
+        { offset: 0.25, transform: `translateX(${newX}px)`, opacity: 1 },
+        { offset: 0.25, transform: `translateY(${newY}px)`, opacity: 1 },
+        { offset: 0.25, transform: `scale(${scale})`, opacity: 1 },
+        { offset: 0.50, transform: `scale(${scale2})`, opacity: 1 },
+        { offset: 0.75, transform: `translateX(${newX}px)`, opacity: 1 },
+        { offset: 0.75, transform: `translateY(${newY}px)`, opacity: 1 },
+        { offset: 1, transform: 'translateY(0)', opacity: 0 }
+      ];
 
-        const animationOptions: KeyframeAnimationOptions = {
-          duration: 1000,
-          iterations: Infinity,
-          easing: 'ease-out'
-        };
-        const element = document.getElementById(animation.id.toString());
-        if (element) {
-          element.animate(keyframes, animationOptions);
-        }
+      const animationOptions: KeyframeAnimationOptions = {
+        duration: 1000,
+        iterations: Infinity,
+        easing: 'ease-out'
+      };
+      const element = document.getElementById(animation.id.toString());
+      if (element) {
+        element.animate(keyframes, animationOptions);
+      }
     }
   }, [animation])
 
