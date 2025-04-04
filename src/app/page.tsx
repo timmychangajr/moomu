@@ -31,7 +31,7 @@ const Page = () => {
   const [animation, setAnimation] = useState<{ id: number; x: number; y: number; size: number }>();
   const buttonDisabled = useMemo(() => !mood, [mood]);
 
-  const cleanState = (interval?: NodeJS.Timeout, synth?: Tone.MonoSynth) => {
+  const cleanState = (interval?: NodeJS.Timeout) => {
     if (interval) clearInterval(interval);
     setSongProgress(0);
     setAnimation(undefined);
@@ -93,7 +93,7 @@ const Page = () => {
     };
 
     setTimeout(() => {
-      cleanState(interval, synth);
+      cleanState(interval);
     }, fullDuration);
   };
 
