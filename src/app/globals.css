@@ -68,7 +68,6 @@ progress::-moz-progress-bar {
 }
 
 .animate-fade {
-  animation: fade 1s ease-out;
   filter: blur(40px);
   position: absolute;
   border-radius: 9999px;

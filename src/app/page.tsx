@@ -28,12 +28,12 @@ const Page = () => {
   const [noteIndex, setNoteIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [songProgress, setSongProgress] = useState(0);
-  const [animations, setAnimations] = useState<{ id: number; x: number; y: number; size: number }[]>([]);
+  const [animation, setAnimation] = useState<{ id: number; x: number; y: number; size: number }>();
   const buttonDisabled = useMemo(() => !mood, [mood]);
 
-  const cleanState  = () => {
+  const cleanState = () => {
     setSongProgress(0);
-    setAnimations([]);
+    setAnimation(undefined);
   }
 
   const handleSend = async () => {
@@ -50,27 +50,22 @@ const Page = () => {
     const x = ranum(window.innerWidth);
     const y = ranum(window.innerHeight);
     const size = ranum(100, 20);
-    setAnimations((prev) => [...prev, { id, x, y, size }]);
+    setAnimation({ id, x, y, size });
+
     setTimeout(() => {
-      setAnimations((prev) => prev.filter((anim) => anim.id !== id));
+      setAnimation(undefined);
     }, 1000);
   };
 
   const playMelody = async () => {
-    if(songProgress > 0) return;
+    if (songProgress > 0) return;
     cleanState()
 
     await Tone.start();
-    const wahwah = [ranum(100), ranum(6), ranum(100, -100)];
-    const shift = new Tone.FrequencyShifter(42).toDestination();
-    const autoWah = new Tone.AutoWah(...wahwah).toDestination();
     const freeverb = new Tone.Freeverb().toDestination()
     freeverb.dampening = ranum(1000);
     const synth = new Tone.MonoSynth()
-    synth.connect(autoWah);
-    synth.connect(shift);
     synth.connect(freeverb);
-    synth.volume.value = -10;
     let currentTime = Tone.now();
 
     response?.forEach(({ note, interval }, index) => {
@@ -92,6 +87,7 @@ const Page = () => {
     setTimeout(() => {
       cleanState();
       synth.dispose();
+      synth.disconnect();
       clearInterval(interval);
     }, fullDuration);
   };
@@ -101,6 +97,37 @@ const Page = () => {
       playMelody();
     }
   }, [response]);
+
+  useEffect(() => {
+    if (animation) {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const scale = ranum(3, 0.5).toFixed(1);
+        const scale2 = ranum(3, 0.5).toFixed(1);
+        const newX = ranum(width, -width);
+        const newY = ranum(width, -height);
+        const keyframes: Keyframe[] = [
+          { offset: 0, transform: 'translateY(0)', opacity: 0 },
+          { offset: 0.25, transform: `translateX(${newX}px)`, opacity: 1 },
+          { offset: 0.25, transform: `translateY(${newY}px)`, opacity: 1 },
+          { offset: 0.25, transform: `scale(${scale})`, opacity: 1 },
+          { offset: 0.50, transform: `scale(${scale2})`, opacity: 1 },
+          { offset: 0.75, transform: `translateX(${newX}px)`, opacity: 1 },
+          { offset: 0.75, transform: `translateY(${newY}px)`, opacity: 1 },
+          { offset: 1, transform: 'translateY(0)', opacity: 0 }
+        ];
+
+        const animationOptions: KeyframeAnimationOptions = {
+          duration: 1000,
+          iterations: Infinity,
+          easing: 'ease-out'
+        };
+        const element = document.getElementById(animation.id.toString());
+        if (element) {
+          element.animate(keyframes, animationOptions);
+        }
+    }
+  }, [animation])
 
   return (
     <div className={styles.container}>
@@ -140,18 +167,19 @@ const Page = () => {
         </div>
       </div>
       <div className={styles.animationContainer}>
-        {animations.map(({ id, x, y, size }) => (
+        {animation &&
           <div
-            key={id}
+            key={animation.id}
+            id={animation.id.toString()}
             className={styles.animation}
             style={{
-              top: y,
-              left: x,
-              width: size,
-              height: size,
+              top: animation.y,
+              left: animation.x,
+              width: animation.size,
+              height: animation.size,
             }}
           />
-        ))}
+        }
       </div>
       <footer className={styles.footer}>
         <span>Powered By Claude AI</span>
