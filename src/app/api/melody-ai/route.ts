@@ -1,27 +1,11 @@
 import { defaultMelody } from "@/services/melody";
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
-
-// export async function POST(req: NextRequest, res: NextResponse) {
-//     const defaultMelody = Array.from({ length: ranum(50, 8) }, () => ({
-//         note: ALL_NOTES[ranum(ALL_NOTES.length)],
-//         interval: ranum(500, 100),
-//     }));
-//     return NextResponse.json(
-//         { melody: defaultMelody },
-//         {
-//             status: 200,
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             },
-//         }
-//     );
-// }
+import { GoogleGenAI, Type } from '@google/genai';
 
 //AI Melody Generation
 export async function POST(req: NextRequest) {
     const { mood } = await req.json()
-    const apiKey = process.env.NEXT_PUBLIC_ANTHROPIC_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
     if (!apiKey) {
         return NextResponse.json(
             { error: 'API key is missing' },
@@ -29,26 +13,47 @@ export async function POST(req: NextRequest) {
         );
     }
 
-    const openai = new OpenAI({
-        apiKey,
-        baseURL: "https://api.anthropic.com/v1/",
-    });
+    const gemini = new GoogleGenAI({ apiKey });
 
-    const response = await openai.chat.completions.create({
-        messages: [
-            {
-                role: "user",
-                content: 'give me a unique melody to try. ' +
-                    'make sure it represents mood: ' + mood +
-                    '. Return raw array value of notes with the following format: ' +
-                    'note: string, interval: milliseconds' +
-                    'No extra text, no explanation, no comments. no line breaks. '
+    const response = await gemini.models.generateContent({
+        model: 'gemini-2.0-flash-exp-image-generation',
+        config: {
+            responseMimeType: 'application/json',
+            responseSchema: {
+                type: Type.ARRAY,
+                items: {
+                    type: Type.OBJECT,
+                    properties: {
+                        'note': {
+                            type: Type.STRING,
+                            description: 'Interpretation/Story/Summary',
+                            nullable: false,
+                        },
+                        'interval': {
+                            type: Type.NUMBER,
+                            description: 'interval between notes in milliseconds',
+                            nullable: false,
+                        },
+                    },
+                    required: ['note', 'interval']
+                }
             },
-        ],
-        response_format: { type: "json_object" },
-        model: "claude-3-7-sonnet-20250219",
+        },
+        contents: 'give me a unique melody to try. ' +
+            'make sure it represents mood: ' + mood +
+            '. Return raw array value of notes with the following format: ' +
+            'note: string, interval: milliseconds' +
+            'No extra text, no explanation, no comments. no line breaks. '
     })
-    const melody = JSON.parse(response?.choices?.[0]?.message?.content || 'null');
+    let melody = defaultMelody
+    const text = response?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (typeof text === "string") {
+        try {
+            melody = JSON.parse(text);
+        } catch {
+            melody = defaultMelody;
+        }
+    }
     return NextResponse.json(
         { melody: melody?.length ? melody : defaultMelody },
         {
